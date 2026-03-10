@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+<title>CIFAR10 Image Classifier</title>
+
+<link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>CIFAR10 Classifier</h1>
+<p class="subtitle">Upload an image to classify using ResNet</p>
+
+<div class="upload-area">
+
+<input type="file" id="imageInput" accept="image/*">
+
+<label for="imageInput" class="upload-btn">
+Choose Image
+</label>
+
+<img id="preview" class="preview"/>
+
+</div>
+
+</div>
+
+<div id="popup" class="popup">
+
+<div class="popup-card">
+
+<h2>Prediction Result</h2>
+
+<p id="resultText"></p>
+
+<button onclick="closePopup()">Close</button>
+
+</div>
+
+</div>
+
+<script>
+
+const input = document.getElementById("imageInput")
+const preview = document.getElementById("preview")
+const popup = document.getElementById("popup")
+const resultText = document.getElementById("resultText")
+
+input.addEventListener("change", async () => {
+
+const file = input.files[0]
+
+if(!file) return
+
+
+const reader = new FileReader()
+
+reader.onload = function(e){
+preview.src = e.target.result
+preview.style.display = "block"
+}
+
+reader.readAsDataURL(file)
+
+
+const formData = new FormData()
+formData.append("file", file)
+
+const response = await fetch("/predict",{
+method:"POST",
+body:formData
+})
+
+const data = await response.json()
+
+resultText.innerText = data.prediction
+
+popup.style.display = "flex"
+
+})
+
+
+function closePopup(){
+popup.style.display = "none"
+}
+
+</script>
+
+</body>
+</html>
